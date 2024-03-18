@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret data sharing through coverless video steganography based on bit
+        plane segmentation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .subheading {
+            text-align: center;
+            /* Center-align the text */
+            margin-top: 10px;
+            /* Add some top margin */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-custom" style="padding: 0;">
+        <!-- Add custom class for styling -->
+        <div class="container-fluid" style="background-color: rgb(96, 96, 244);">
+            <a class="navbar-brand" href="#">
+                <img src="logo.png" alt="Your Logo" height="120" width="120">
+            </a>
+            <!-- Heading -->
+            <div class="mx-auto">
+                <h1 style="text-align: center;">IT-352 Information Assurance and Security Course Project</h1>
+                <!-- Subheading -->
+                <h6 style="text-align: center;">Secret data sharing through coverless video steganography based on bit
+                    plane segmentation</h6>
+            </div>
+        </div>
+    </nav>
+
+    <h2 style="margin: 20px 10px; text-align: center;">Encrytion</h2>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 mx-auto"> <!-- Added mx-auto class for centering -->
+                <h2>Choose Video File</h2>
+                <input type="file" class="form-control" id="EnvideoInput" accept="video/mp4">
+                <br>
+                <h2>Choose Text File</h2>
+                <input type="file" class="form-control" id="EntextInput" accept="text/plain">
+                <br>
+                <span style="margin: 20px 10px;">
+                    <button class="btn btn-primary" style="margin: auto 10px;"
+                        onclick="UploadInputFile()">Upload</button>
+                    <button class="btn btn-success" style="margin: auto 10px;" onclick="InputStart()">Start the
+                        Execution</button>
+                    <button class="btn btn-info" style="margin: auto 10px;" onclick="InputDownloadVideo()">Download
+                        Video</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="margin: 30px 30px; text-align: center;">Decryption</h2>
+
+    <div style="margin-bottom:40px;" class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <h2>Choose Video File</h2>
+                <input type="file" class="form-control" id="DevideoInput" accept="video/mp4">
+                <br>
+                <span>
+                    <button class="btn btn-primary" style="margin: auto 10px;"
+                        onclick="OutputuploadFile()">Upload</button>
+                    <button class="btn btn-success" style="margin: auto 10px;" onclick="Outputstart()">Start the
+                        Execution</button>
+                    <button class="btn btn-info" style="margin: auto 10px;" onclick="OutputdownloadTextFile()">Download
+                        Text
+                        File</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-custom" style="padding: 0;">
+        <!-- Add custom class for styling -->
+        <div class="container-fluid">
+            <!-- Heading -->
+            <div class="mx-auto">
+                <h6 style="text-align: center;">Done under the guidance of Prof Jaidhar CD</h6>
+                <h6 style="text-align: center;">By:</h6>
+                <h6 style="text-align: center;">Vismay P(211IT083)</h6>
+                <h6 style="text-align: center;">Krishna Kumar K(211IT034)</h6>
+                <h6 style="text-align: center;">R D Karthik(211IT050)</h6>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function InputStart() {
+            const baseUrl = 'http://127.0.0.1:5000/encoding';
+            const endPoints = "/start";
+            fetch(baseUrl + endPoints, {
+                method: 'GET',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Return the response as text
+                    } else {
+                        // If the response is not OK, throw an error
+                        console('Network response was not ok.')
+                    }
+                })
+                .catch(error => {
+                    // Log any errors to the console
+                    console.error('There was a problem with the GET request:', error);
+                });
+        }
+
+        function InputDownloadVideo() {
+            const baseUrl = 'http://127.0.0.1:5000/encoding';
+            const endPoints = "/output";
+            fetch(baseUrl + endPoints)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to download video');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'output.mp4';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function UploadInputFile() {
+            const baseUrl = 'http://127.0.0.1:5000/encoding';
+            const textInput = document.getElementById('EntextInput');
+            const videoInput = document.getElementById('EnvideoInput');
+            const textFile = textInput.files[0];
+            const videoFile = videoInput.files[0];
+            const textformData = new FormData();
+            const videoformData = new FormData();
+            textformData.append('file', textFile);
+            videoformData.append('file', videoFile);
+            endPoints = "/upload/mp4";
+            fetch(baseUrl + endPoints, {
+                method: 'POST',
+                body: videoformData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('File uploaded successfully');
+                        alert('Video File uploaded successfully');
+
+                    } else {
+                        console.error('Failed to upload file');
+                        alert('An error occurred while uploading the file');
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            endPoints = "/upload/text"
+            fetch(baseUrl + endPoints, {
+                method: 'POST',
+                body: textformData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('File uploaded successfully');
+                        alert('Text File uploaded successfully');
+
+                    } else {
+                        console.error('Failed to upload file');
+                        alert('An error occurred while uploading the file');
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        const baseUrl = 'http://127.0.0.1:5000/decoding';
+
+        function Outputstart() {
+            const baseUrl = 'http://127.0.0.1:5000/decoding';
+            const endPoints = "/start";
+            // Make the GET request using fetch
+            fetch(baseUrl + endPoints, {
+                method: 'GET',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Return the response as text
+                        console(response.text())
+                    } else {
+                        // If the response is not OK, throw an error
+                        console('Network response was not ok.')
+                    }
+                })
+                .catch(error => {
+                    // Log any errors to the console
+                    console.error('There was a problem with the GET request:', error);
+                });
+        }
+
+        function OutputdownloadTextFile() {
+            const baseUrl = 'http://127.0.0.1:5000/decoding';
+            const endPoints = "/output";
+            fetch(baseUrl + endPoints)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to download text file');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'output.txt';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function OutputuploadFile() {
+            const baseUrl = 'http://127.0.0.1:5000/decoding';
+            const videoInput = document.getElementById('DevideoInput');
+            const videoFile = videoInput.files[0];
+            const videoformData = new FormData();
+            videoformData.append('file', videoFile);
+            endPoints = "/upload/mp4";
+            fetch(baseUrl + endPoints, {
+                method: 'POST',
+                body: videoformData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('File uploaded successfully');
+                        alert('Video File uploaded successfully');
+
+                    } else {
+                        console.error('Failed to upload file');
+                        alert('An error occurred while uploading the file');
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>
